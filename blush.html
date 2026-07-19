@@ -1,0 +1,1556 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blush Recommender</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Argent+CF:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Poppins", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #fff0f5 0%, #ffe4f0 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      /* Navigation */
+      .nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 1200px;
+        margin: 0 auto 30px;
+        padding: 15px 20px;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      }
+
+      .back-btn {
+        background: none;
+        border: none;
+        color: #e91e63;
+        font-size: 16px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        transition: all 0.3s;
+        padding: 8px 15px;
+        border-radius: 8px;
+        font-family: "Poppins", sans-serif;
+      }
+
+      .back-btn:hover {
+        background: #ffe8f0;
+      }
+
+      .nav-title {
+        font-size: 32px;
+        color: #e91e63;
+        font-weight: 700;
+        font-family: "Argent CF", serif;
+        font-style: italic;
+        letter-spacing: -1px;
+        background: linear-gradient(135deg, #e91e63, #c2185b);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        position: relative;
+        padding: 5px 15px;
+      }
+
+      .nav-title::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, #ffe8f0, #fff5f7);
+        border-radius: 10px;
+        z-index: -1;
+        transform: skew(-5deg);
+        box-shadow: 0 4px 10px rgba(233, 30, 99, 0.15);
+      }
+
+      /* Container */
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 24px;
+        padding: 50px;
+        box-shadow: 0 10px 40px rgba(233, 30, 99, 0.1);
+        animation: fadeIn 0.6s ease;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+
+      .header .icon {
+        font-size: 80px;
+        margin-bottom: 20px;
+        animation: bounce 2s infinite;
+      }
+
+      .header h1 {
+        font-size: 36px;
+        color: #333;
+        margin-bottom: 10px;
+        font-family: "Poppins", sans-serif;
+      }
+
+      .header p {
+        font-size: 16px;
+        color: #666;
+        font-family: "Poppins", sans-serif;
+      }
+
+      /* Form Section */
+      .form-section {
+        margin-bottom: 35px;
+      }
+
+      .form-section label {
+        display: block;
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 15px;
+        font-family: "Poppins", sans-serif;
+      }
+
+      .option-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+      }
+
+      .option-card {
+        background: #f8f9fa;
+        border: 3px solid transparent;
+        border-radius: 16px;
+        padding: 25px 15px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      .option-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(233, 30, 99, 0.15);
+      }
+
+      .option-card.selected {
+        border-color: #e91e63;
+        background: linear-gradient(135deg, #ffe8f0, #fff5f7);
+        box-shadow: 0 8px 20px rgba(233, 30, 99, 0.2);
+      }
+
+      .option-card .emoji {
+        font-size: 40px;
+        margin-bottom: 10px;
+        display: block;
+      }
+
+      .option-card .label {
+        font-size: 15px;
+        font-weight: 600;
+        color: #333;
+        font-family: "Poppins", sans-serif;
+      }
+
+      .option-card .checkmark {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 24px;
+        height: 24px;
+        background: #e91e63;
+        border-radius: 50%;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 14px;
+      }
+
+      .option-card.selected .checkmark {
+        display: flex;
+      }
+
+      /* Color Swatches */
+      .color-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 15px;
+      }
+
+      .color-option {
+        aspect-ratio: 1;
+        border-radius: 16px;
+        border: 4px solid transparent;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .color-option:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+      }
+
+      .color-option.selected {
+        border-color: #e91e63;
+        box-shadow: 0 8px 20px rgba(233, 30, 99, 0.3);
+      }
+
+      .color-option .checkmark {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 30px;
+        height: 30px;
+        background: white;
+        border-radius: 50%;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        color: #e91e63;
+        font-size: 18px;
+        font-weight: bold;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      .color-option.selected .checkmark {
+        display: flex;
+      }
+
+      /* Skin Tones */
+      .tone-light {
+        background: #fde4d0;
+      }
+      .tone-medium {
+        background: #d4a574;
+      }
+      .tone-tan {
+        background: #c68642;
+      }
+      .tone-deep {
+        background: #8b5a3c;
+      }
+
+      /* Undertones */
+      .undertone-cool {
+        background: linear-gradient(135deg, #ffc4d6, #c4d6ff);
+      }
+      .undertone-warm {
+        background: linear-gradient(135deg, #ffd6a5, #ffb88c);
+      }
+      .undertone-neutral {
+        background: linear-gradient(135deg, #e5d4c1, #d4c4b0);
+      }
+
+      /* Previous Product Section */
+      .previous-product {
+        background: #f8f9fa;
+        border-radius: 16px;
+        padding: 25px;
+        margin-bottom: 30px;
+      }
+
+      .search-container {
+        position: relative;
+        margin-bottom: 15px;
+      }
+
+      .search-input {
+        width: 100%;
+        padding: 15px 20px;
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        font-family: "Poppins", sans-serif;
+      }
+
+      .search-input:focus {
+        outline: none;
+        border-color: #e91e63;
+        box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.1);
+      }
+
+      .search-results {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 10;
+        display: none;
+      }
+
+      .search-result-item {
+        padding: 12px 20px;
+        cursor: pointer;
+        border-bottom: 1px solid #f0f0f0;
+        transition: all 0.2s ease;
+        font-family: "Poppins", sans-serif;
+      }
+
+      .search-result-item:hover {
+        background: #ffe8f0;
+      }
+
+      .selected-product {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        background: white;
+        padding: 15px;
+        border-radius: 12px;
+        margin-top: 15px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      }
+
+      .selected-product img {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 8px;
+      }
+
+      .product-details {
+        flex: 1;
+      }
+
+      .product-brand {
+        font-weight: bold;
+        color: #333;
+        font-family: "Poppins", sans-serif;
+      }
+
+      .product-name {
+        color: #666;
+        font-size: 14px;
+        font-family: "Poppins", sans-serif;
+      }
+
+      .product-shade {
+        color: #e91e63;
+        font-weight: 500;
+        margin-top: 5px;
+        font-family: "Poppins", sans-serif;
+      }
+
+      .remove-btn {
+        background: none;
+        border: none;
+        color: #999;
+        cursor: pointer;
+        font-size: 18px;
+        transition: color 0.3s;
+      }
+
+      .remove-btn:hover {
+        color: #e91e63;
+      }
+
+      /* Submit Button */
+      .submit-btn {
+        width: 100%;
+        background: linear-gradient(135deg, #e91e63, #c2185b);
+        color: white;
+        border: none;
+        padding: 18px;
+        border-radius: 16px;
+        font-size: 18px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 6px 20px rgba(233, 30, 99, 0.3);
+        margin-top: 30px;
+        font-family: "Poppins", sans-serif;
+      }
+
+      .submit-btn:hover {
+        background: linear-gradient(135deg, #d81b60, #ad1457);
+        box-shadow: 0 8px 25px rgba(233, 30, 99, 0.4);
+        transform: translateY(-2px);
+      }
+
+      .submit-btn:active {
+        transform: translateY(0);
+      }
+
+      .submit-btn:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
+
+      /* Result Section */
+      .result {
+        display: none;
+        margin-top: 40px;
+        padding: 30px;
+        background: linear-gradient(135deg, #ffe8f0, #fff5f7);
+        border-radius: 20px;
+        border-left: 6px solid #e91e63;
+      }
+
+      .result h3 {
+        font-size: 24px;
+        color: #333;
+        margin-bottom: 15px;
+        font-family: "Poppins", sans-serif;
+      }
+
+      .result p {
+        font-size: 16px;
+        color: #666;
+        line-height: 1.8;
+        font-family: "Poppins", sans-serif;
+      }
+
+      .result .recommendation {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        margin-top: 20px;
+      }
+
+      .result .recommendation h4 {
+        color: #e91e63;
+        font-size: 20px;
+        margin-bottom: 10px;
+        font-family: "Poppins", sans-serif;
+      }
+
+      /* Product Recommendations */
+      .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+      }
+
+      .product-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(233, 30, 99, 0.2);
+      }
+
+      .product-image {
+        height: 150px;
+        background: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 40px;
+        color: #e91e63;
+      }
+
+      .product-info {
+        padding: 15px;
+      }
+
+      .product-brand {
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 5px;
+        font-family: "Poppins", sans-serif;
+      }
+
+      .product-name {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 10px;
+        font-family: "Poppins", sans-serif;
+      }
+
+      .product-shade {
+        color: #e91e63;
+        font-weight: 500;
+        margin-bottom: 10px;
+        font-size: 13px;
+        font-family: "Poppins", sans-serif;
+      }
+
+      .product-price {
+        color: #e91e63;
+        font-weight: bold;
+        margin-bottom: 10px;
+        font-family: "Poppins", sans-serif;
+      }
+
+      .shopee-btn {
+        display: block;
+        width: 100%;
+        background: #f57224;
+        color: white;
+        text-align: center;
+        padding: 8px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        font-family: "Poppins", sans-serif;
+      }
+
+      .shopee-btn:hover {
+        background: #e55e1b;
+      }
+
+      .local-badge {
+        background: #4caf50;
+        color: white;
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: bold;
+        display: inline-block;
+        margin-left: 5px;
+        font-family: "Poppins", sans-serif;
+      }
+
+      .popular-badge {
+        background: #e91e63;
+        color: white;
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: bold;
+        display: inline-block;
+        margin-left: 5px;
+        font-family: "Poppins", sans-serif;
+      }
+
+      /* Animations */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes bounce {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          padding: 30px 20px;
+        }
+
+        .header h1 {
+          font-size: 28px;
+        }
+
+        .option-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .product-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .nav-title {
+          font-size: 24px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav class="nav">
+      <button class="back-btn" onclick="goBack()">← Back to Home</button>
+      <div class="nav-title">FindTint</div>
+      <div style="width: 120px"></div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container">
+      <div class="header">
+        <div class="icon">🌸</div>
+        <h1>Find Your Perfect Blush</h1>
+        <p>Answer a few questions to get personalized recommendations</p>
+      </div>
+
+      <!-- Previous Product -->
+      <div class="form-section previous-product">
+        <label>What blush are you currently using? (Optional)</label>
+        <p style="color: #666; font-size: 14px; margin-bottom: 15px">
+          Tell us about your current favorite blush to get better
+          recommendations
+        </p>
+
+        <div class="search-container">
+          <input
+            type="text"
+            class="search-input"
+            id="productSearch"
+            placeholder="Search for your blush product..."
+            oninput="searchProducts(this.value)"
+          />
+          <div class="search-results" id="searchResults"></div>
+        </div>
+
+        <div id="selectedProductContainer"></div>
+      </div>
+
+      <!-- Skin Tone -->
+      <div class="form-section">
+        <label>What's your skin tone?</label>
+        <div class="color-grid">
+          <div
+            class="color-option tone-light"
+            data-value="light"
+            onclick="selectColor(this, 'skinTone')"
+          >
+            <div class="checkmark">✓</div>
+          </div>
+          <div
+            class="color-option tone-medium"
+            data-value="medium"
+            onclick="selectColor(this, 'skinTone')"
+          >
+            <div class="checkmark">✓</div>
+          </div>
+          <div
+            class="color-option tone-tan"
+            data-value="tan"
+            onclick="selectColor(this, 'skinTone')"
+          >
+            <div class="checkmark">✓</div>
+          </div>
+          <div
+            class="color-option tone-deep"
+            data-value="deep"
+            onclick="selectColor(this, 'skinTone')"
+          >
+            <div class="checkmark">✓</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Undertone -->
+      <div class="form-section">
+        <label>What's your undertone?</label>
+        <div class="option-grid">
+          <div
+            class="option-card undertone-cool"
+            data-value="cool"
+            onclick="selectOption(this, 'undertone')"
+          >
+            <span class="checkmark">✓</span>
+            <span class="emoji">❄️</span>
+            <span class="label">Cool</span>
+          </div>
+          <div
+            class="option-card undertone-warm"
+            data-value="warm"
+            onclick="selectOption(this, 'undertone')"
+          >
+            <span class="checkmark">✓</span>
+            <span class="emoji">☀️</span>
+            <span class="label">Warm</span>
+          </div>
+          <div
+            class="option-card undertone-neutral"
+            data-value="neutral"
+            onclick="selectOption(this, 'undertone')"
+          >
+            <span class="checkmark">✓</span>
+            <span class="emoji">🌿</span>
+            <span class="label">Neutral</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Blush Type -->
+      <div class="form-section">
+        <label>What type of blush do you prefer?</label>
+        <div class="option-grid">
+          <div
+            class="option-card"
+            data-value="powder"
+            onclick="selectOption(this, 'blushType')"
+          >
+            <span class="checkmark">✓</span>
+            <span class="emoji">💫</span>
+            <span class="label">Powder</span>
+          </div>
+          <div
+            class="option-card"
+            data-value="cream"
+            onclick="selectOption(this, 'blushType')"
+          >
+            <span class="checkmark">✓</span>
+            <span class="emoji">✨</span>
+            <span class="label">Cream</span>
+          </div>
+          <div
+            class="option-card"
+            data-value="liquid"
+            onclick="selectOption(this, 'blushType')"
+          >
+            <span class="checkmark">✓</span>
+            <span class="emoji">💧</span>
+            <span class="label">Liquid</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Finish -->
+      <div class="form-section">
+        <label>What finish do you like?</label>
+        <div class="option-grid">
+          <div
+            class="option-card"
+            data-value="matte"
+            onclick="selectOption(this, 'finish')"
+          >
+            <span class="checkmark">✓</span>
+            <span class="emoji">🎨</span>
+            <span class="label">Matte</span>
+          </div>
+          <div
+            class="option-card"
+            data-value="dewy"
+            onclick="selectOption(this, 'finish')"
+          >
+            <span class="checkmark">✓</span>
+            <span class="emoji">💎</span>
+            <span class="label">Dewy</span>
+          </div>
+          <div
+            class="option-card"
+            data-value="shimmer"
+            onclick="selectOption(this, 'finish')"
+          >
+            <span class="checkmark">✓</span>
+            <span class="emoji">✨</span>
+            <span class="label">Shimmer</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="submit-btn" onclick="getRecommendation()">
+        Get My Recommendation 🌸
+      </button>
+
+      <!-- Result -->
+      <div class="result" id="result">
+        <h3>Your Perfect Blush Match! 🎉</h3>
+        <div class="recommendation" id="recommendationContent"></div>
+        <div id="productRecommendations"></div>
+      </div>
+    </div>
+
+    <script>
+      let selections = {
+        skinTone: null,
+        undertone: null,
+        blushType: null,
+        finish: null,
+        previousProduct: null,
+      };
+
+      // Database produk blush NYATA dengan semua brand
+      const blushProducts = [
+        // INEZ
+        {
+          id: 1,
+          brand: "Inez",
+          name: "Blusher Blush On",
+          shade: "Italian Sun",
+          type: "powder",
+          finish: "matte",
+          skinTone: "light",
+          undertone: "warm",
+          price: "Rp 25.000",
+          shopeeLink:
+            "https://shopee.co.id/Inez-Blusher-Blush-On-i.8077122.19782994681",
+          image: "🌸",
+          local: true,
+          popular: true,
+        },
+        {
+          id: 2,
+          brand: "Inez",
+          name: "Blusher Blush On",
+          shade: "Amaranth Pink",
+          type: "powder",
+          finish: "matte",
+          skinTone: "light",
+          undertone: "cool",
+          price: "Rp 25.000",
+          shopeeLink:
+            "https://shopee.co.id/Inez-Blusher-Blush-On-i.8077122.19782994681",
+          image: "🌸",
+          local: true,
+        },
+        {
+          id: 3,
+          brand: "Inez",
+          name: "Blusher Blush On",
+          shade: "Burning Sand",
+          type: "powder",
+          finish: "matte",
+          skinTone: "medium",
+          undertone: "warm",
+          price: "Rp 25.000",
+          shopeeLink:
+            "https://shopee.co.id/Inez-Blusher-Blush-On-i.8077122.19782994681",
+          image: "🌸",
+          local: true,
+        },
+        {
+          id: 4,
+          brand: "Inez",
+          name: "Blusher Blush On",
+          shade: "Autumn Rose",
+          type: "powder",
+          finish: "matte",
+          skinTone: "medium",
+          undertone: "neutral",
+          price: "Rp 25.000",
+          shopeeLink:
+            "https://shopee.co.id/Inez-Blusher-Blush-On-i.8077122.19782994681",
+          image: "🌸",
+          local: true,
+        },
+        {
+          id: 5,
+          brand: "Inez",
+          name: "Blusher Blush On",
+          shade: "Modest Blush",
+          type: "powder",
+          finish: "matte",
+          skinTone: "light",
+          undertone: "neutral",
+          price: "Rp 25.000",
+          shopeeLink:
+            "https://shopee.co.id/Inez-Blusher-Blush-On-i.8077122.19782994681",
+          image: "🌸",
+          local: true,
+        },
+        {
+          id: 6,
+          brand: "Inez",
+          name: "Blusher Blush On",
+          shade: "Persian Rose",
+          type: "powder",
+          finish: "matte",
+          skinTone: "tan",
+          undertone: "cool",
+          price: "Rp 25.000",
+          shopeeLink:
+            "https://shopee.co.id/Inez-Blusher-Blush-On-i.8077122.19782994681",
+          image: "🌸",
+          local: true,
+        },
+        {
+          id: 7,
+          brand: "Inez",
+          name: "Blusher Blush On",
+          shade: "Gold Dipped Brick",
+          type: "powder",
+          finish: "shimmer",
+          skinTone: "deep",
+          undertone: "warm",
+          price: "Rp 25.000",
+          shopeeLink:
+            "https://shopee.co.id/Inez-Blusher-Blush-On-i.8077122.19782994681",
+          image: "🌸",
+          local: true,
+        },
+        {
+          id: 8,
+          brand: "Inez",
+          name: "Blusher Blush On",
+          shade: "Amber Peach",
+          type: "powder",
+          finish: "matte",
+          skinTone: "medium",
+          undertone: "warm",
+          price: "Rp 25.000",
+          shopeeLink:
+            "https://shopee.co.id/Inez-Blusher-Blush-On-i.8077122.19782994681",
+          image: "🌸",
+          local: true,
+        },
+
+        // REVLON
+        {
+          id: 9,
+          brand: "Revlon",
+          name: "Blush On",
+          shade: "002 Haute Pink",
+          type: "powder",
+          finish: "matte",
+          skinTone: "light",
+          undertone: "cool",
+          price: "Rp 85.000",
+          shopeeLink:
+            "https://shopee.co.id/Blush-On-Revlon-i.45951055.6401361943",
+          image: "🌸",
+          popular: true,
+        },
+        {
+          id: 10,
+          brand: "Revlon",
+          name: "Blush On",
+          shade: "003 Marveoluse",
+          type: "powder",
+          finish: "shimmer",
+          skinTone: "light",
+          undertone: "neutral",
+          price: "Rp 85.000",
+          shopeeLink:
+            "https://shopee.co.id/Blush-On-Revlon-i.45951055.6401361943",
+          image: "🌸",
+        },
+        {
+          id: 11,
+          brand: "Revlon",
+          name: "Blush On",
+          shade: "004 Wine Not",
+          type: "powder",
+          finish: "matte",
+          skinTone: "deep",
+          undertone: "cool",
+          price: "Rp 85.000",
+          shopeeLink:
+            "https://shopee.co.id/Blush-On-Revlon-i.45951055.6401361943",
+          image: "🌸",
+        },
+        {
+          id: 12,
+          brand: "Revlon",
+          name: "Blush On",
+          shade: "006 Naughty Nude",
+          type: "powder",
+          finish: "matte",
+          skinTone: "light",
+          undertone: "neutral",
+          price: "Rp 85.000",
+          shopeeLink:
+            "https://shopee.co.id/Blush-On-Revlon-i.45951055.6401361943",
+          image: "🌸",
+        },
+        {
+          id: 13,
+          brand: "Revlon",
+          name: "Blush On",
+          shade: "008 Racy Rose",
+          type: "powder",
+          finish: "matte",
+          skinTone: "medium",
+          undertone: "cool",
+          price: "Rp 85.000",
+          shopeeLink:
+            "https://shopee.co.id/Blush-On-Revlon-i.45951055.6401361943",
+          image: "🌸",
+        },
+        {
+          id: 14,
+          brand: "Revlon",
+          name: "Blush On",
+          shade: "010 Classy Coral",
+          type: "powder",
+          finish: "matte",
+          skinTone: "medium",
+          undertone: "warm",
+          price: "Rp 85.000",
+          shopeeLink:
+            "https://shopee.co.id/Blush-On-Revlon-i.45951055.6401361943",
+          image: "🌸",
+        },
+
+        // VIVA
+        {
+          id: 15,
+          brand: "Viva",
+          name: "Blush On Powder",
+          shade: "Pink",
+          type: "powder",
+          finish: "matte",
+          skinTone: "light",
+          undertone: "cool",
+          price: "Rp 20.000",
+          shopeeLink:
+            "https://shopee.co.id/Viva-Blush-on-i.70428130.4279670970",
+          image: "🌸",
+          local: true,
+        },
+        {
+          id: 16,
+          brand: "Viva",
+          name: "Blush On Powder",
+          shade: "Peach",
+          type: "powder",
+          finish: "matte",
+          skinTone: "light",
+          undertone: "warm",
+          price: "Rp 20.000",
+          shopeeLink:
+            "https://shopee.co.id/Viva-Blush-on-i.70428130.4279670970",
+          image: "🌸",
+          local: true,
+        },
+        {
+          id: 17,
+          brand: "Viva",
+          name: "Blush On Powder",
+          shade: "Coral",
+          type: "powder",
+          finish: "matte",
+          skinTone: "medium",
+          undertone: "warm",
+          price: "Rp 20.000",
+          shopeeLink:
+            "https://shopee.co.id/Viva-Blush-on-i.70428130.4279670970",
+          image: "🌸",
+          local: true,
+        },
+
+        // PIXY
+        {
+          id: 18,
+          brand: "Pixy",
+          name: "Twin Blush",
+          shade: "01 Pop Terracotta",
+          type: "powder",
+          finish: "matte",
+          skinTone: "medium",
+          undertone: "warm",
+          price: "Rp 65.000",
+          shopeeLink:
+            "https://shopee.co.id/PIXY-Twin-Blush-2-in-1-Make-Up-Base-Blush-6g-i.276578339.21781305271",
+          image: "🌸",
+          local: true,
+          popular: true,
+        },
+        {
+          id: 19,
+          brand: "Pixy",
+          name: "Twin Blush",
+          shade: "02 Active Pink",
+          type: "powder",
+          finish: "matte",
+          skinTone: "light",
+          undertone: "cool",
+          price: "Rp 65.000",
+          shopeeLink:
+            "https://shopee.co.id/PIXY-Twin-Blush-2-in-1-Make-Up-Base-Blush-6g-i.276578339.21781305271",
+          image: "🌸",
+          local: true,
+        },
+        {
+          id: 20,
+          brand: "Pixy",
+          name: "End Matte Blush",
+          shade: "Pink Delight",
+          type: "powder",
+          finish: "matte",
+          skinTone: "light",
+          undertone: "cool",
+          price: "Rp 75.000",
+          shopeeLink:
+            "https://shopee.co.id/PIXY-End-Matte-Blush-5g-i.276578339.21781305272",
+          image: "🌸",
+          local: true,
+        },
+        {
+          id: 21,
+          brand: "Pixy",
+          name: "Glam Over Blush",
+          shade: "Coral Glow",
+          type: "powder",
+          finish: "shimmer",
+          skinTone: "medium",
+          undertone: "warm",
+          price: "Rp 80.000",
+          shopeeLink:
+            "https://shopee.co.id/PIXY-Glam-Over-Blush-6g-i.276578339.21781305273",
+          image: "🌸",
+          local: true,
+        },
+        {
+          id: 22,
+          brand: "Pixy",
+          name: "Makeup Blush Stick",
+          shade: "Rosy Pink",
+          type: "cream",
+          finish: "dewy",
+          skinTone: "light",
+          undertone: "cool",
+          price: "Rp 95.000",
+          shopeeLink:
+            "https://shopee.co.id/PIXY-Make-Up-Blush-Stick-5g-i.276578339.21781305274",
+          image: "🌸",
+          local: true,
+        },
+
+        // HANASUI
+        {
+          id: 23,
+          brand: "Hanasui",
+          name: "Perfect Cheek Blush",
+          shade: "Pink",
+          type: "powder",
+          finish: "matte",
+          skinTone: "light",
+          undertone: "cool",
+          price: "Rp 35.000",
+          shopeeLink:
+            "https://shopee.co.id/Hanasui-Perfect-Cheek-Blush-Go-Powder-Blush-On-Powder-Natural-Radiant-Finish-Melembabkan-Cerah-Antioksidan-i.129681299.14813718634",
+          image: "🌸",
+          local: true,
+        },
+        {
+          id: 24,
+          brand: "Hanasui",
+          name: "Perfect Cheek Blush",
+          shade: "Peach",
+          type: "powder",
+          finish: "matte",
+          skinTone: "light",
+          undertone: "warm",
+          price: "Rp 35.000",
+          shopeeLink:
+            "https://shopee.co.id/Hanasui-Perfect-Cheek-Blush-Go-Powder-Blush-On-Powder-Natural-Radiant-Finish-Melembabkan-Cerah-Antioksidan-i.129681299.14813718634",
+          image: "🌸",
+          local: true,
+        },
+
+        // IMPLORA
+        {
+          id: 25,
+          brand: "Implora",
+          name: "Cheek Blossom Blush On",
+          shade: "01 Coral Peach",
+          type: "powder",
+          finish: "matte",
+          skinTone: "light",
+          undertone: "warm",
+          price: "Rp 30.000",
+          shopeeLink:
+            "https://shopee.co.id/Implora-Cheek-Blossom-Blush-On-i.8077122.5479664296",
+          image: "🌸",
+          local: true,
+        },
+        {
+          id: 26,
+          brand: "Implora",
+          name: "Cheek Blossom Blush On",
+          shade: "02 Dusty Rose",
+          type: "powder",
+          finish: "matte",
+          skinTone: "light",
+          undertone: "cool",
+          price: "Rp 30.000",
+          shopeeLink:
+            "https://shopee.co.id/Implora-Cheek-Blossom-Blush-On-i.8077122.5479664296",
+          image: "🌸",
+          local: true,
+        },
+        {
+          id: 27,
+          brand: "Implora",
+          name: "Cheek Blossom Blush On",
+          shade: "03 Pink Candy",
+          type: "powder",
+          finish: "matte",
+          skinTone: "light",
+          undertone: "cool",
+          price: "Rp 30.000",
+          shopeeLink:
+            "https://shopee.co.id/Implora-Cheek-Blossom-Blush-On-i.8077122.5479664296",
+          image: "🌸",
+          local: true,
+        },
+        {
+          id: 28,
+          brand: "Implora",
+          name: "Cheek Blossom Blush On",
+          shade: "04 Sweet Salmon",
+          type: "powder",
+          finish: "matte",
+          skinTone: "medium",
+          undertone: "neutral",
+          price: "Rp 30.000",
+          shopeeLink:
+            "https://shopee.co.id/Implora-Cheek-Blossom-Blush-On-i.8077122.5479664296",
+          image: "🌸",
+          local: true,
+        },
+
+        // SALSA
+        {
+          id: 29,
+          brand: "Salsa",
+          name: "Blush On Powder",
+          shade: "Pinkish Natural",
+          type: "powder",
+          finish: "matte",
+          skinTone: "light",
+          undertone: "neutral",
+          price: "Rp 28.000",
+          shopeeLink:
+            "https://shopee.co.id/Bunga-Blush-on-Powder-Salsa-Blush-on-Salsa-Perona-pipi-i.16890711.27685167026",
+          image: "🌸",
+          local: true,
+        },
+        {
+          id: 30,
+          brand: "Salsa",
+          name: "Blush On Powder",
+          shade: "Peachy Warm",
+          type: "powder",
+          finish: "matte",
+          skinTone: "light",
+          undertone: "warm",
+          price: "Rp 28.000",
+          shopeeLink:
+            "https://shopee.co.id/Bunga-Blush-on-Powder-Salsa-Blush-on-Salsa-Perona-pipi-i.16890711.27685167026",
+          image: "🌸",
+          local: true,
+        },
+        {
+          id: 31,
+          brand: "Salsa",
+          name: "Blush On Powder",
+          shade: "Rosy Deep",
+          type: "powder",
+          finish: "matte",
+          skinTone: "tan",
+          undertone: "cool",
+          price: "Rp 28.000",
+          shopeeLink:
+            "https://shopee.co.id/Bunga-Blush-on-Powder-Salsa-Blush-on-Salsa-Perona-pipi-i.16890711.27685167026",
+          image: "🌸",
+          local: true,
+        },
+      ];
+
+      function searchProducts(query) {
+        const resultsContainer = document.getElementById("searchResults");
+
+        if (query.length < 2) {
+          resultsContainer.style.display = "none";
+          return;
+        }
+
+        const filteredProducts = blushProducts.filter(
+          (product) =>
+            product.brand.toLowerCase().includes(query.toLowerCase()) ||
+            product.name.toLowerCase().includes(query.toLowerCase()) ||
+            product.shade.toLowerCase().includes(query.toLowerCase())
+        );
+
+        if (filteredProducts.length > 0) {
+          resultsContainer.innerHTML = filteredProducts
+            .map(
+              (product) => `
+          <div class="search-result-item" onclick="selectPreviousProduct(${product.id})">
+            <div style="font-weight: bold;">${product.brand} ${product.name}</div>
+            <div style="font-size: 12px; color: #666;">Shade: ${product.shade} • ${product.price}</div>
+          </div>
+        `
+            )
+            .join("");
+          resultsContainer.style.display = "block";
+        } else {
+          resultsContainer.innerHTML =
+            '<div class="search-result-item">No products found</div>';
+          resultsContainer.style.display = "block";
+        }
+      }
+
+      function selectPreviousProduct(productId) {
+        const product = blushProducts.find((p) => p.id === productId);
+        selections.previousProduct = product;
+
+        document.getElementById("searchResults").style.display = "none";
+        document.getElementById("productSearch").value = "";
+
+        const container = document.getElementById("selectedProductContainer");
+        container.innerHTML = `
+        <div class="selected-product">
+          <div class="product-image">${product.image}</div>
+          <div class="product-details">
+            <div class="product-brand">${product.brand}</div>
+            <div class="product-name">${product.name}</div>
+            <div class="product-shade">Shade: ${product.shade}</div>
+          </div>
+          <button class="remove-btn" onclick="removePreviousProduct()">×</button>
+        </div>
+      `;
+      }
+
+      function removePreviousProduct() {
+        selections.previousProduct = null;
+        document.getElementById("selectedProductContainer").innerHTML = "";
+      }
+
+      function selectOption(element, category) {
+        const parent = element.parentElement;
+        parent
+          .querySelectorAll(".option-card")
+          .forEach((card) => card.classList.remove("selected"));
+        element.classList.add("selected");
+        selections[category] = element.dataset.value;
+      }
+
+      function selectColor(element, category) {
+        const parent = element.parentElement;
+        parent
+          .querySelectorAll(".color-option")
+          .forEach((card) => card.classList.remove("selected"));
+        element.classList.add("selected");
+        selections[category] = element.dataset.value;
+      }
+
+      function getRecommendation() {
+        if (
+          !selections.skinTone ||
+          !selections.undertone ||
+          !selections.blushType ||
+          !selections.finish
+        ) {
+          alert(
+            "Please answer all questions before getting your recommendation!"
+          );
+          return;
+        }
+
+        const recommendations = {
+          light: {
+            cool: "Soft pink atau rosy tones sangat cocok dengan undertone cool Anda. Coba shade pink muda atau dusty rose untuk flush natural.",
+            warm: "Peachy coral shades akan mempercantik undertone warm Anda. Pilih coral atau warm peach tones.",
+            neutral:
+              "Anda bisa menggunakan warna cool maupun warm! Coba dusty rose atau soft coral shades.",
+          },
+          medium: {
+            cool: "Berry dan mauve tones complement kulit Anda. Coba dusty rose atau berry pink shades.",
+            warm: "Warm terracotta dan burnt orange shades sangat cantik di kulit medium. Coba coral atau warm peach tones.",
+            neutral:
+              "Rose gold dan neutral pinks sempurna untuk Anda. Coba rosy brown atau warm mauve shades.",
+          },
+          tan: {
+            cool: "Deep berry dan plum tones sangat cocok. Coba wine atau deep rose shades.",
+            warm: "Rich terracotta dan burnt sienna terlihat amazing. Coba copper atau warm bronze tones.",
+            neutral:
+              "Warm brown dan brick red shades ideal. Coba cinnamon atau toasted almond tones.",
+          },
+          deep: {
+            cool: "Bold plum dan deep berry shades sangat stunning. Coba burgundy atau deep wine tones.",
+            warm: "Rich rust dan deep orange tones sempurna. Coba burnt orange atau deep terracotta.",
+            neutral:
+              "Deep mauve dan chocolate berry sangat cantik. Coba deep brown atau brick red tones.",
+          },
+        };
+
+        const typeInfo = {
+          powder:
+            "Powder blush memberikan coverage yang bisa dibuild dan tahan lama sepanjang hari.",
+          cream:
+            "Cream blush memberikan finish natural dan dewy, mudah blend ke kulit.",
+          liquid:
+            "Liquid blush memberikan warna vibrant yang tahan lama dengan feel lightweight.",
+        };
+
+        const finishInfo = {
+          matte:
+            "Matte finish memberikan look natural dan velvety, perfect untuk everyday wear.",
+          dewy: "Dewy finish menambah healthy, luminous glow di pipi.",
+          shimmer:
+            "Shimmer finish menambah dimension dan catch the light dengan cantik.",
+        };
+
+        const recommendation =
+          recommendations[selections.skinTone][selections.undertone];
+        const type = typeInfo[selections.blushType];
+        const finish = finishInfo[selections.finish];
+
+        // Filter produk berdasarkan preferensi pengguna dan produk sebelumnya
+        let filteredProducts = blushProducts.filter(
+          (product) =>
+            product.skinTone === selections.skinTone &&
+            product.undertone === selections.undertone &&
+            (product.type === selections.blushType ||
+              product.finish === selections.finish)
+        );
+
+        // Jika ada produk sebelumnya, prioritaskan produk dengan shade yang mirip
+        if (selections.previousProduct) {
+          const previousShade = selections.previousProduct.shade.toLowerCase();
+
+          // Urutkan produk berdasarkan kesamaan shade dengan produk sebelumnya
+          filteredProducts.sort((a, b) => {
+            const aSimilar =
+              a.shade.toLowerCase().includes(previousShade) ||
+              previousShade.includes(a.shade.toLowerCase());
+            const bSimilar =
+              b.shade.toLowerCase().includes(previousShade) ||
+              previousShade.includes(b.shade.toLowerCase());
+
+            if (aSimilar && !bSimilar) return -1;
+            if (!aSimilar && bSimilar) return 1;
+            return 0;
+          });
+
+          // Tambahkan produk dari brand yang sama
+          const sameBrandProducts = blushProducts.filter(
+            (product) =>
+              product.brand === selections.previousProduct.brand &&
+              product.id !== selections.previousProduct.id
+          );
+
+          filteredProducts = [...filteredProducts, ...sameBrandProducts];
+        }
+
+        // Hapus duplikat dan ambil maksimal 6 produk
+        filteredProducts = filteredProducts
+          .filter(
+            (product, index, self) =>
+              index === self.findIndex((p) => p.id === product.id)
+          )
+          .slice(0, 6);
+
+        // Generate HTML untuk produk
+        let productsHTML = "";
+        if (filteredProducts.length > 0) {
+          productsHTML = `
+          <h4 style="margin-top: 30px;">Recommended Products:</h4>
+          <div class="product-grid">
+            ${filteredProducts
+              .map(
+                (product) => `
+              <div class="product-card" onclick="window.open('${
+                product.shopeeLink
+              }', '_blank')">
+                <div class="product-image">${product.image}</div>
+                <div class="product-info">
+                  <div class="product-brand">${product.brand} 
+                    ${
+                      product.local
+                        ? '<span class="local-badge">LOCAL</span>'
+                        : ""
+                    }
+                    ${
+                      product.popular
+                        ? '<span class="popular-badge">POPULAR</span>'
+                        : ""
+                    }
+                  </div>
+                  <div class="product-name">${product.name}</div>
+                  <div class="product-shade">Shade: ${product.shade}</div>
+                  <div class="product-price">${product.price}</div>
+                  <a href="${
+                    product.shopeeLink
+                  }" class="shopee-btn" target="_blank">Shop on Shopee</a>
+                </div>
+              </div>
+            `
+              )
+              .join("")}
+          </div>
+        `;
+        }
+
+        let previousProductInfo = "";
+        if (selections.previousProduct) {
+          previousProductInfo = `
+          <p><strong>Previous Product:</strong> ${selections.previousProduct.brand} ${selections.previousProduct.name} in ${selections.previousProduct.shade}</p>
+        `;
+        }
+
+        document.getElementById("recommendationContent").innerHTML = `
+        <h4>Based on Your Selections:</h4>
+        ${previousProductInfo}
+        <p><strong>Skin Tone:</strong> ${
+          selections.skinTone.charAt(0).toUpperCase() +
+          selections.skinTone.slice(1)
+        }</p>
+        <p><strong>Undertone:</strong> ${
+          selections.undertone.charAt(0).toUpperCase() +
+          selections.undertone.slice(1)
+        }</p>
+        <p><strong>Type:</strong> ${
+          selections.blushType.charAt(0).toUpperCase() +
+          selections.blushType.slice(1)
+        } - ${type}</p>
+        <p><strong>Finish:</strong> ${
+          selections.finish.charAt(0).toUpperCase() + selections.finish.slice(1)
+        } - ${finish}</p>
+        <hr style="margin: 20px 0; border: none; border-top: 2px solid #ffe8f0;">
+        <h4>Our Recommendation:</h4>
+        <p>${recommendation}</p>
+      `;
+
+        document.getElementById("productRecommendations").innerHTML =
+          productsHTML;
+        document.getElementById("result").style.display = "block";
+        document
+          .getElementById("result")
+          .scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+
+      function goBack() {
+        if (
+          confirm(
+            "Are you sure you want to go back? Your selections will be lost."
+          )
+        ) {
+          window.location.href = "main.html";
+        }
+      }
+    </script>
+  </body>
+</html>
